@@ -1,0 +1,221 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+package lógica {
+    class Elemento {}
+    package fruta {
+        class Fruta {
+        - puntaje: int
+        - coordenadaX: int
+        - coordenadaY: int
+        }
+        Limon --U|> Fruta
+        Sandia --U|> Fruta
+        Uva --U|> Fruta
+    }
+    class BadIceCream {
+                KeyH: ManejadorTeclas
+                - FPS: int
+                + empezarHiloDelJuego()
+                + run()
+                - actualizarJugador()
+
+    }
+    BadIceCream ..|> Runnable
+    Interface Runnable
+    package nivel {
+        class Nivel {
+        - nombre: String
+        - puntaje: int
+        - elJuegoSeTermino: boolean
+        - seHaGanadoElJuego: boolean
+
+        + actualizarNivel()
+        + actualizarJugador(accion: int)
+        + moverHelado(sPosition: int)
+        + verEstadoDelJuego()
+        }
+        Nivel1 --|> Nivel
+        Nivel2 --|> Nivel
+        class Mapa {
+        - {STATIC} TAMANIO_X: int
+        - {STATIC} TAMANIO_Y: int
+
+        + validarPosicionMonstruo(monstruo: Monstruo)
+        + validarPosicionDelJugador(helado: Helado)
+        + agregarPersonaje(personaje: Personaje)
+        + actualizarPosicionDelPersonaje(personaje: Personaje)
+        + actualizarPosicionDeFrutas()
+        + moverMonstruos()
+        + monstruosEliminan(helado: Helado)
+        + monstruoMataAHelado(helado: Helado, monstruo: Monstruo)
+        + existeUnBloque(x: int, y: int)
+        + hayFruta(x: int, y: int)
+        + obtenerFruta(x: int, y: int)
+        + eliminarFruta(x: int, y: int)
+        + laPosicionEstaVacía(x: int, y: int)
+        + hayHielo(x: int, y: int)
+        + ponerHielo(direccion: int, xInicial: int, yInicial: int)
+        + romperHielo(direccion: int, xInicial: int, yInicial: int)
+        + quedanFrutas()
+        + imprimirMapa()
+
+
+        + ponerHielo()
+        + romperHielo()
+        }
+        Mapa1 --|> Mapa
+        Mapa2 --|> Mapa
+    }
+    package obstaculo {
+        class Obstaculo {
+        }
+        BloqueEstatico --|> Obstaculo
+        Hielo --|> Obstaculo
+    }
+    package personaje {
+        class Personaje {
+        - coordenadaX: int
+        - coordenadaY: int
+        - coordenadaXAnterior: int
+        - coordenadaYAnterior: int
+        - PosibleX: int
+        - PosibleY: int
+        - {STATIC} VELOCIDAD: int
+        # direccionActual: int
+
+        + desplazarse(direccion: int)
+        + calcularCoordenadasPosibles(accion: int)
+        + obtenerUltimaDireccion(accion: int)
+        }
+        Monstruo --|> Personaje
+        class Helado extends Personaje {
+        - color: String
+        + recogerFruta(mapa:Mapa)
+        + romperOPonerHielo(mapa:Mapa)
+        }
+        Chocolate --|> Helado
+        abstract class Monstruo {
+        - nombre: String
+        - direccion: int
+        + {abstract} cambiarDireccion()
+        }
+        Vaca --|> Monstruo
+        Troll --|> Monstruo
+    }
+        Helado ..u> Mapa
+
+}
+    Fruta --|> Elemento
+    Obstaculo --|> Elemento
+    Personaje --|> Elemento
+    Nivel --> "1"Mapa
+    Nivel --> "1"Helado
+    Mapa --> "*" Monstruo
+    Mapa --> "*"Fruta
+    Mapa --> "*"Elemento
+
+package datos {
+    class AlmacenamientoNivel {
+    + guardar(nivel: Nivel)
+    + obtenerNivelGuardado()
+    }
+}
+AlmacenamientoNivel ..> Nivel
+package presentación {
+    package celda {
+        class Celda {
+        - imagen: BufferedImage
+
+        
+        }
+        class ManejadorCelda {
+        - gp: PanelBadIceCream
+        - keyH: ManejadorTeclas
+        + obtenerImagenDeCelda()
+        + dibujarObjetos(g2: Graphics2D, posiciones: Elemento[][])
+        + dibujarFondo(g2: Graphics)
+        }
+    }
+    package controlador {
+            class ManejadorDeTeclas {
+            + arribaPres: boolean
+            + abajoPres: boolean
+            + izquierdaPres: boolean
+            + derechaPres: boolean
+            + espacioPres: boolean
+            + arribaSolt: boolean
+            + abajoSolt: boolean
+            + izquierdaSolt: boolean
+            + derechaSolt: boolean
+            + espacioSolt: boolean
+            + keyPressed(e: KeyEvent)
+            + keyReleased(e: KeyEvent)
+            }
+            class PanelBadIceCream extends JPanel implements Runnable {
+                - detenerse: boolean
+                - {static}ventanaJuego: JFrame
+                - tamanioOriginalCelda: int
+                - escala: int
+                + tamanioCelda: int
+                + cantMaxCol: int
+                + cantMaxFil: int
+                + anchoPantalla: int
+                + alturaPantalla: int
+                  FPS: int
+                + eliminarVentana()
+                + empezarJuego()
+                + run()
+                + paintComponent(g: Graphics)
+            }
+
+        PanelBadIceCream -> "1" ManejadorCelda
+        PanelBadIceCream....> AlmacenamientoNivel
+        }
+    package entidad {
+        class Entidad {
+        + x: int
+        + y: int
+        + arriba1, arriba2, abajo1, abajo2, izqu1, izqu2, der1, der2: BufferedImage
+        + contadorFigura: int
+        + figuraNum: int
+        }
+        class Jugador {
+        - gp: PanelBadIceCream
+        - nivel: Nivel
+        + getPlayerImage()
+        + actualizarImagen()
+        + draw(g2: Graphics)
+        }
+        Jugador -|> Entidad
+
+    }
+    package ventana {
+        class VentanaResultado {
+        - ganado: boolean
+        - mensajeLabel: JLabel
+        - panel: JPanel
+        - botonRegresarANiveles: JButton
+        }
+        class Ventana {
+        + iniciarComponentes()
+        + crearBotonNivel(texto:S String, x: int, y: int, ancho: int, alto: int, nivel: int)
+
+        }
+        VentanaResultado --U|> JFrame
+        Ventana --U|> JFrame
+    }
+    PanelBadIceCream --> "1" BadIceCream
+    PanelBadIceCream --U> "1" Jugador
+    VentanaResultado <..U PanelBadIceCream
+
+    Ventana .>PanelBadIceCream
+    Jugador --> ManejadorDeTeclas
+
+}
+ManejadorCelda --> "*"Celda
+lógica ..> datos
+presentación ..> lógica
+    BadIceCream --> "1" Nivel
+
+@enduml
